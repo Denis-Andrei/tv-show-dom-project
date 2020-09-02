@@ -1,11 +1,11 @@
 :root {
-  --color-1: #5E0525;
-  --color-2: #CE0027;
+  --color-1: #551315;
+  --color-2: #b11318;
   --color-3: #FC7C3D;
-  --color-3-lighter: #fdc1a3;
-  --color-2-transparent: #CE0027bb;
-  --color-3-transparent: #fc7d3dbb;
+  --color-2-transparent: #b113189c;
 
+  --color-bg-1: #000;
+  --color-bg-2: #141414;
   --color-white-smoke: #EDEDF1;
 }
 *{
@@ -19,8 +19,7 @@ html{
 }
 
 body{
-  background-image: linear-gradient(to top right,var(--color-1) 40%, var(--color-2)  );
-  /* height: 100vh; */
+  background-image: linear-gradient(to bottom right,var(--color-bg-1), var(--color-bg-2)  );
   font-size: 1.6rem;
   font-family: 'Montserrat', sans-serif;
   width: 100%;
@@ -28,7 +27,6 @@ body{
 }
 
 #root {
-  /* color: red; */
   font-size: 3rem;
   
 }
@@ -124,6 +122,7 @@ body{
 
 .hero-text{
   font-weight: 400;
+  text-align: center;
   color: white;
   position: absolute;
   text-shadow: 0 0 30px whitesmoke;
@@ -151,8 +150,8 @@ body{
 .episode{
   width: 35rem;
   margin: 4rem 2rem;
-  background-image: linear-gradient(to top, var(--color-2), var(--color-3) );
-  box-shadow: 0 0 5px white;
+  background-image: linear-gradient(to top, var(--color-1), var(--color-2) );
+  box-shadow: 0 0 3px white;
   cursor: pointer;
   transition: all .6s;
   position: relative;
@@ -167,7 +166,7 @@ body{
 }
 
 .episode:hover .episode-title{
-  background-color: var(--color-3);
+  background-color: var(--color-2);
 }
 
 
@@ -185,7 +184,7 @@ body{
   font-size: 2rem;
   font-weight: 500;
   text-align: center;
-  background-color: var(--color-3-transparent);
+  background-color: var(--color-2-transparent);
   color: white;
   width: 70%;
   margin: 0 auto;
@@ -207,13 +206,13 @@ body{
 }
 
 .episode-letter{
-  color: var(--color-1);
+  color: #ffffff;
   font-size: 1.8rem;
-  font-weight: 700;
+  font-weight: 500;
   margin-left: 5px;
 }
 .episode-number{
-  color: var(--color-3-lighter);
+  color: var(--color-3);
   font-size: 2.3rem;
   transition: all .6s;
 }
@@ -221,14 +220,14 @@ body{
 .episode-description{
   padding: 0 1rem;
   font-size: 1.8rem;
-  color: var(--color-1);
+  color: var(--color-3);
   font-weight: 600;
 }
 
 .episode-summary{
   font-size: 1.4rem;
   padding: 1rem;
-  height: 20rem;
+  min-height: 20rem;
   color: var(--color-white-smoke);
   font-weight: 300;
   text-align: justify;
@@ -244,8 +243,7 @@ body{
 
   margin: 5rem auto 0 auto;
   padding: 3rem;
-  background-image: linear-gradient(to right, var(--color-3), var(--color-3) );
-  border-top: 1px solid var(--color-1);
+  background-color: var(--color-2-transparent);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -259,4 +257,43 @@ body{
 .copyright-image{
   width: 14rem;
   margin-top: 2rem;
+}
+
+
+/* ---------------------------------------------------------- */
+/* MEDIA QUERIES*/
+/* ---------------------------------------------------------- */
+
+@media screen and (max-width: 1100px){
+  .hero-text{
+    font-size: 5rem;
+    top: 3rem;
+  }
+}
+@media screen and (max-width: 750px){
+  .hero-text{
+    font-size: 4rem;
+  }
+  .hero-img{
+    height: 25rem;
+  }
+  .hero-text{
+    width: 90%;
+    
+  }
+
+  .episode{
+    width: 70%;
+  }
+}
+@media screen and (max-width: 500px){
+  .hero-text{
+    font-size: 3.5rem;
+  }
+  .hero-img{
+    height: 20rem;
+  }
+  .episode{
+    width: 90%;
+  }
 }
