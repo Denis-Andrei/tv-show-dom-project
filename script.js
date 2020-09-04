@@ -1,37 +1,39 @@
 //You can edit ALL of the code here
+const rootElem = document.getElementById("root");
+const allEpisodes = getAllEpisodes();
+
 function setup() {
-  const allEpisodes = getAllEpisodes();
   makePageForEpisodes(allEpisodes);
 }
-const rootElem = document.getElementById("root");
+
+
+
+
 function makePageForEpisodes(episodeList) {
-  
-  // rootElem.textContent = `Got ${episodeList.length} episode(s) `;
-  
-  // Create Hero Section
+  //Add Hero Section
   rootElem.appendChild(createHeroSection());
-  const div = document.createElement('div');
-  div.setAttribute('class', 'episodes');
-  rootElem.appendChild(div);
   
-
-  episodeList.map(item=> {
-    div.appendChild(createEpisodeCard(item.name, item.season, item.number, item.image.original, item.summary));
-  })
-
-
-  rootElem.appendChild(createCopyright('Original data from', 'https://static.tvmaze.com/images/tvm-header-logo.png'))
-  ;
-
+  //Add Episodes section
+  const episodes = createEpisodesSection();
   
+  //Create and Append the Input Fields (Search Bar)
+  const createInputBox = createInputsSection(episodeList.length, episodes);
+  rootElem.appendChild(createInputBox);
   
+  //Display episodes on the page
+  displayMovies(episodeList, episodes);
+  
+  //Appending Episodes + Copyright Section
+  rootElem.appendChild(episodes);
+  rootElem.appendChild(createCopyright('Original data from', 'https://static.tvmaze.com/images/tvm-header-logo.png'));
 }
+
+
 
 function createHeroSection(){
   //create div container for hero
   const div = document.createElement('div');
   div.setAttribute('class', 'hero');
-
 
   //create image tag 
   const img = document.createElement('img');
@@ -44,15 +46,18 @@ function createHeroSection(){
   heroText.setAttribute('class', 'hero-text');
 
   //append elements
-  
   div.appendChild(img);
   div.appendChild(heroText);
-
   return div;
 }
+
+
+
 function createEpisodesSection(){
   //create div container for episodes
-  
+  const episodes = document.createElement('episodes');
+  episodes.setAttribute('class', 'episodes');
+  return episodes;
 }
 
 
@@ -90,13 +95,10 @@ function createEpisodeCard(title, seasonNr, episodeNr, imageUrl, summary){
   ep.setAttribute('class', 'episode-number');
   ep.textContent = episodeNr < 10 ? '0' + episodeNr : episodeNr;
   
-  
   episodeInfo.appendChild(S);
   episodeInfo.appendChild(season);
   episodeInfo.appendChild(E);
   episodeInfo.appendChild(ep);
-  
-
   ///////////////////////////////////////////
 
   const episodeSeasonNr = document.createElement('p');
@@ -115,7 +117,6 @@ function createEpisodeCard(title, seasonNr, episodeNr, imageUrl, summary){
   episodeSummary.innerHTML = summary;
   episodeSummary.setAttribute('class', 'episode-summary');
 
-
   episode.appendChild(episodeImg);
   episode.appendChild(episodeTitle);
   episode.appendChild(episodeInfo);
@@ -125,6 +126,8 @@ function createEpisodeCard(title, seasonNr, episodeNr, imageUrl, summary){
 }
 
 
+
+
 function createCopyright(text, imageUrl){
   const copyrightBox = document.createElement('div');
   copyrightBox.setAttribute('class', 'copyright');
@@ -132,9 +135,6 @@ function createCopyright(text, imageUrl){
   const copyrightText = document.createElement('h5');
   copyrightText.setAttribute('class', 'copyright-text');
   copyrightText.innerHTML = text;
-
-  
-
 
   const copyrightImage = document.createElement('img');
   copyrightImage.setAttribute('class', 'copyright-image');
@@ -150,6 +150,52 @@ function createCopyright(text, imageUrl){
   return copyrightBox;
 }
 
+
+
+
+function createInputsSection(lengthOfTheList, parent){
+  let filteredLengthOfTheList = lengthOfTheList;
+
+  const inputsBox = document.createElement('div');
+  inputsBox.setAttribute('class', 'inputs-container');
+
+  const search = document.createElement('input');
+  search.setAttribute('type', 'search');
+  search.setAttribute('class', 'input-search');
+  search.setAttribute('placeholder', 'Search...');
+
+  search.addEventListener('keyup', (e)=> {
+    e.preventDefault();
+    let searchInputvalue = e.target.value; 
+    parent.innerHTML = '';
+    displayMovies(filteredEpisodes(searchInputvalue), parent);
+    filteredLengthOfTheList =  filteredEpisodes(searchInputvalue).length;
+    text.innerHTML = `Displaying ${filteredLengthOfTheList} / ${lengthOfTheList} `;
+  })
+  
+
+  const text = document.createElement('p');
+  text.setAttribute('class', 'search-text');
+  text.innerHTML = `Displaying ${filteredLengthOfTheList} / ${lengthOfTheList} `;
+
+  inputsBox.appendChild(search);
+  inputsBox.appendChild(text);
+  return inputsBox;
+}
+
+
+
+function displayMovies(list, parentDiv){
+  list.map(item => {
+    parentDiv.appendChild(createEpisodeCard(item.name, item.season, item.number, item.image.original, item.summary));
+  })
+}
+
+
+
+function filteredEpisodes(word){
+  return allEpisodes.filter(episode => episode.name.toLowerCase().includes(word.toLowerCase()) || episode.summary.toLowerCase().includes(word.toLowerCase())  ? episode : '');
+}
 
 
 window.onload = setup;
