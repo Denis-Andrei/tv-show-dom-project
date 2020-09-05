@@ -73,33 +73,12 @@ function createEpisodeCard(title, seasonNr, episodeNr, imageUrl, summary){
   episodeTitle.textContent = title;
   episodeTitle.setAttribute('class', 'episode-title');
 
-
-  ///////////////////////////////////////////
-  //Season + Episode     Ex. S01E01
   const episodeInfo = document.createElement('p');
   episodeInfo.setAttribute('class', 'episode-info');
 
-  const S = document.createElement('span');
-  S.setAttribute('class', 'episode-letter');
-  S.textContent = 'S';
-
-  const E = document.createElement('span');
-  E.setAttribute('class', 'episode-letter');
-  E.textContent = 'E';
-
-  const season = document.createElement('span');
-  season.setAttribute('class', 'episode-number');
-  season.textContent = seasonNr < 10 ? '0' + seasonNr : seasonNr;
-
-  const ep = document.createElement('span');
-  ep.setAttribute('class', 'episode-number');
-  ep.textContent = episodeNr < 10 ? '0' + episodeNr : episodeNr;
+  //format episode title
+  seasonEpisodeFormat(seasonNr, episodeNr, episodeInfo);
   
-  episodeInfo.appendChild(S);
-  episodeInfo.appendChild(season);
-  episodeInfo.appendChild(E);
-  episodeInfo.appendChild(ep);
-  ///////////////////////////////////////////
 
   const episodeSeasonNr = document.createElement('p');
   episodeSeasonNr.textContent = seasonNr;
@@ -126,7 +105,29 @@ function createEpisodeCard(title, seasonNr, episodeNr, imageUrl, summary){
 }
 
 
+function seasonEpisodeFormat(seasonNr, episodeNr, parent){
+  const S = document.createElement('span');
+  S.setAttribute('class', 'episode-letter');
+  S.textContent = 'S';
 
+  const E = document.createElement('span');
+  E.setAttribute('class', 'episode-letter');
+  E.textContent = 'E';
+
+  const season = document.createElement('span');
+  season.setAttribute('class', 'episode-number');
+  season.textContent = seasonNr < 10 ? '0' + seasonNr : seasonNr;
+
+  const ep = document.createElement('span');
+  ep.setAttribute('class', 'episode-number');
+  ep.textContent = episodeNr < 10 ? '0' + episodeNr : episodeNr;
+  
+  parent.appendChild(S);
+  parent.appendChild(season);
+  parent.appendChild(E);
+  parent.appendChild(ep);
+  return parent;
+}
 
 function createCopyright(text, imageUrl){
   const copyrightBox = document.createElement('div');
@@ -164,8 +165,42 @@ function createInputsSection(lengthOfTheList, parent){
   search.setAttribute('class', 'input-search');
   search.setAttribute('placeholder', 'Search...');
 
+
+  const selector = document.createElement('select');
+  selector.setAttribute('class', 'selector-list');
+
+  
+  
+
+  const option = document.createElement('option');
+  option.setAttribute('class', 'option');
+  option.innerHTML = 'All episodes'
+  selector.appendChild(option);
+
+  allEpisodes.map(episode => {
+    
+    const option = document.createElement('option');
+    option.setAttribute('class', 'option1');
+    let format = seasonEpisodeFormat(episode.season, episode.number, option);
+    option.innerHTML =  `${format.value} - ${episode.name}`;
+    selector.appendChild(option);
+  })
+  
+  
+  selector.addEventListener('change', (e) => {
+    e.preventDefault();
+    search.value = '';
+    let title = e.target.value;
+    let currentOption = option.value;
+    parent.innerHTML = '';
+    displayMovies(filteredEpisodeByOption(title, currentOption), parent);
+    filteredLengthOfTheList =  filteredEpisodeByOption(title, currentOption).length;
+    text.innerHTML = `Displaying ${filteredLengthOfTheList} / ${lengthOfTheList} `;
+  })
+
   search.addEventListener('keyup', (e)=> {
     e.preventDefault();
+    selector.value = option.value;
     let searchInputvalue = e.target.value; 
     parent.innerHTML = '';
     displayMovies(filteredEpisodes(searchInputvalue), parent);
@@ -178,23 +213,29 @@ function createInputsSection(lengthOfTheList, parent){
   text.setAttribute('class', 'search-text');
   text.innerHTML = `Displaying ${filteredLengthOfTheList} / ${lengthOfTheList} `;
 
+  
+
   inputsBox.appendChild(search);
+  inputsBox.appendChild(selector);
   inputsBox.appendChild(text);
   return inputsBox;
 }
 
 
 
-function displayMovies(list, parentDiv){
+function displayMovies(list, parentElement){
   list.map(item => {
-    parentDiv.appendChild(createEpisodeCard(item.name, item.season, item.number, item.image.original, item.summary));
+    parentElement.appendChild(createEpisodeCard(item.name, item.season, item.number, item.image.original, item.summary));
   })
 }
 
-
-
 function filteredEpisodes(word){
   return allEpisodes.filter(episode => episode.name.toLowerCase().includes(word.toLowerCase()) || episode.summary.toLowerCase().includes(word.toLowerCase())  ? episode : '');
+}
+
+function filteredEpisodeByOption(title, initialOption){
+  return title === initialOption ? allEpisodes : allEpisodes.filter(episode => title.includes(episode.name));
+  
 }
 
 
