@@ -24,7 +24,7 @@ body{
   font-family: 'Montserrat', sans-serif;
   width: 100%;
   overflow-x: hidden;
-}
+} 
 
 #root {
   font-size: 3rem;
@@ -110,10 +110,6 @@ body{
 /* ---------------------------------------------------------- */
 
 
-.hero{
-
-}
-
 .hero-img{
   width: 100vw;
   object-fit: cover;
@@ -125,7 +121,7 @@ body{
   text-align: center;
   color: white;
   position: absolute;
-  text-shadow: 0 0 30px whitesmoke;
+  text-shadow: 0 0 40px whitesmoke;
   top: 5rem;
   left: 50%;
   transform: translateX(-50%);
@@ -137,7 +133,7 @@ body{
 /* EPISODES */
 /* ---------------------------------------------------------- */
 
-.episodes{
+.episodes-section{
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -159,7 +155,6 @@ body{
 .episode:hover{
   transform: translateY(-1px);
   box-shadow: 1px 1px 10px white;
-  
 }
 .episode:hover .episode-img{
   filter: grayscale(0);
@@ -168,8 +163,6 @@ body{
 .episode:hover .episode-title{
   background-color: var(--color-2);
 }
-
-
 
 .episode-img{
   width: 100%;
@@ -264,9 +257,8 @@ body{
 /* INPUTS CONTAINER*/
 /* ---------------------------------------------------------- */
 
-.inputs-container{
+.inputs-section{
   margin: 3rem auto;
-  
   display: flex;
   justify-content: center;
   align-items: center;
@@ -284,14 +276,9 @@ body{
   background-color: var(--color-white-smoke);
 }
 
-
-
 .input-search::-webkit-search-cancel-button{
   appearance:none;
 }
-
-
-
 
 .search-text{
   width: 20rem;
@@ -305,49 +292,47 @@ body{
 }
 
 
-
-.option1{
-  color: var(--color-2);
-  
-}
-
 /* ---------------------------------------------------------- */
 /* MEDIA QUERIES*/
 /* ---------------------------------------------------------- */
 
-@media screen and (max-width: 1100px){
+@media screen and (max-width: 1380px){
   .hero-text{
     font-size: 5rem;
-    top: 3rem;
+    top: 4rem;
   }
   .copyright-text{
     font-size: 1.8rem;
   }
 }
+@media screen and (max-width: 1000px){
+  .hero-text{
+    font-size: 4rem;
+    top: 2rem;
+  }
+  
+}
 @media screen and (max-width: 800px){
   .input-search, .selector-list{
     width: 28rem;
   }
+  
 }
 
 
 @media screen and (max-width: 750px){
   .hero-text{
+    width: 90%;
     font-size: 4rem;
+    top: 3rem;
   }
   .hero-img{
     height: 25rem;
   }
-  .hero-text{
-    width: 90%;
-    
-  }
-
   .episode{
     width: 70%;
   }
-
-  .inputs-container{
+  .inputs-section{
     flex-direction: column;
   }
   .input-search{
