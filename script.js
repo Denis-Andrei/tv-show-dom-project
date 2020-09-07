@@ -54,7 +54,7 @@ function createInputsSection(episodeList){
   allEpisodes.map(episode => {
     const inputOption = document.createElement('option');
     inputOption.setAttribute('class', 'option');
-    let format = `S${seasonFormat(episode.season)} E${episodeFormat(episode.number)}`;
+    let format = `S${seasonEpisodeFormat(episode.season)} E${seasonEpisodeFormat(episode.number)}`;
     inputOption.innerHTML =  `${format} - ${episode.name}`;
     inputSelector.appendChild(inputOption);
   })
@@ -101,9 +101,9 @@ function createEpisodeCard(title, seasonNr, episodeNr, imageUrl, summary){
   E.setAttribute('class', 'episode-letter');
   E.textContent = 'E';
   season.setAttribute('class', 'episode-number');
-  season.textContent = seasonFormat(seasonNr);
+  season.textContent = seasonEpisodeFormat(seasonNr);
   ep.setAttribute('class', 'episode-number');
-  ep.textContent = episodeFormat(episodeNr);
+  ep.textContent = seasonEpisodeFormat(episodeNr);
   episodeDescription.textContent = 'Description';
   episodeDescription.setAttribute('class', 'episode-description');
   episodeSummary.innerHTML = summary;
@@ -177,11 +177,8 @@ function filterEpisodeListByOption(option){
   return allEpisodes.filter(episode => option === firstOption ? allEpisodes : option.includes(episode.name.toLowerCase()));
 }
 
-function seasonFormat(seasonNr){
+function seasonEpisodeFormat(seasonNr){
   return seasonNr < 10 ? '0' + seasonNr : seasonNr;
-}
-function episodeFormat(episodeNr){  
-  return episodeNr < 10 ? '0' + episodeNr : episodeNr;  
 }
 
 function displayEpisodes(episodeList, parentNode){
