@@ -1,9 +1,19 @@
 //You can edit ALL of the code here
-const allEpisodes = getAllEpisodes();
+const allShows = getAllShows();
+console.log(allShows)
+
+let allEpisodes = fetchData('https://api.tvmaze.com/shows/82/episodes');
 const rootElem = document.getElementById("root");
 
 function setup() {
   makePageForEpisodes(allEpisodes);
+}
+
+function fetchData(link){
+  fetch(link)
+  .then(res => res.json())
+  .then(data => allEpisodes = data)
+ 
 }
 
 function makePageForEpisodes(episodeList) {
@@ -32,11 +42,40 @@ function createHeroSection(){
   return heroSection;
 }
 
+function createSelector(name, list){
+  const selector = document.createElement('select');
+  const option = document.createElement('option');
+
+  selector.setAttribute('class', `selector-list-${name}`);
+  option.setAttribute('class', `first-option-${name}`);
+
+  option.innerHTML = `All ${name}`;
+
+  selector.appendChild(option); 
+
+  list.map(item => {
+    let format = '';
+    const option = document.createElement('option');
+    option.setAttribute('class', 'option');
+    if(name.includes('episode')){
+      format = `S${seasonEpisodeFormat(item.season)} E${seasonEpisodeFormat(item.number)}`;
+      option.innerHTML =  `${format} - ${item.name}`;
+    }else{
+      option.innerHTML =  item.name;
+    }
+    
+    selector.appendChild(option);
+  })
+
+
+  return selector;
+}
+
 function createInputsSection(episodeList){
   const inputsSection = document.createElement('div');
   const inputSearch = document.createElement('input');
-  const inputSelector = document.createElement('select');
-  const inputOption = document.createElement('option');
+  // const episodeSelector = document.createElement('select');
+  // const episodeOption = document.createElement('option');
   const text = document.createElement('p');
   
 
@@ -44,26 +83,28 @@ function createInputsSection(episodeList){
   inputSearch.setAttribute('type', 'search');
   inputSearch.setAttribute('class', 'input-search');
   inputSearch.setAttribute('placeholder', 'Search...');
-  inputSelector.setAttribute('class', 'selector-list');
-  inputOption.setAttribute('class', 'first-option');
-  inputOption.innerHTML = 'All episodes';
+  // episodeSelector.setAttribute('class', 'selector-list');
+  // episodeOption.setAttribute('class', 'first-option');
+  // episodeOption.innerHTML = 'All episodes';
   text.setAttribute('class', 'search-text');
   text.innerHTML = `Displaying ${ episodeList.length } / ${allEpisodes.length} `;
-  inputSelector.appendChild(inputOption); 
+  // episodeSelector.appendChild(episodeOption); 
 
-  allEpisodes.map(episode => {
-    const inputOption = document.createElement('option');
-    inputOption.setAttribute('class', 'option');
-    let format = `S${seasonEpisodeFormat(episode.season)} E${seasonEpisodeFormat(episode.number)}`;
-    inputOption.innerHTML =  `${format} - ${episode.name}`;
-    inputSelector.appendChild(inputOption);
-  })
-  
+  // allEpisodes.map(episode => {
+  //   const episodeOption = document.createElement('option');
+  //   episodeOption.setAttribute('class', 'option');
+  //   let format = `S${seasonEpisodeFormat(episode.season)} E${seasonEpisodeFormat(episode.number)}`;
+  //   episodeOption.innerHTML =  `${format} - ${episode.name}`;
+  //   episodeSelector.appendChild(episodeOption);
+  // })
+  let showSelector = createSelector('shows', allShows); //first parameter hardcoded 
+  let episodeSelector = createSelector('episodes', allEpisodes); //first parameter hardcoded 
+
   inputSearch.addEventListener('keyup', onSearchEvent);
-  inputSelector.addEventListener('change', onSelectEvent);
-
+  episodeSelector.addEventListener('change', onSelectEvent);
+  inputsSection.appendChild(showSelector);
+  inputsSection.appendChild(episodeSelector);
   inputsSection.appendChild(inputSearch);
-  inputsSection.appendChild(inputSelector);
   inputsSection.appendChild(text);
 
   return inputsSection;
@@ -173,7 +214,7 @@ function filterEpisodeListByWord(word){
   return allEpisodes.filter(episode => episode.name.toLowerCase().includes(word) || episode.summary.toLowerCase().includes(word));
 }
 function filterEpisodeListByOption(option){
-  const firstOption = document.querySelector('.first-option').value.toLowerCase();
+  const firstOption = document.querySelector('.first-option-episodes').value.toLowerCase();
   return allEpisodes.filter(episode => option === firstOption ? allEpisodes : option.includes(episode.name.toLowerCase()));
 }
 
