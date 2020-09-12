@@ -1,13 +1,20 @@
 //You can edit ALL of the code here
 let allShows = alphabeticalSort(getAllShows());
 let allEpisodes; 
-fetchData('https://api.tvmaze.com/shows/82/episodes');
 
+fetchData('https://api.tvmaze.com/shows/82/episodes');
 const rootElem = document.getElementById("root");
 
 function setup() {
-  
-  makePageForEpisodes(allEpisodes);
+  fetch('https://api.tvmaze.com/shows/82/episodes')
+  .then(res => res.json())
+  .then(data => {
+    allEpisodes = data;
+    makePageForEpisodes(allEpisodes);
+
+  })
+  .catch(err => alert(err))
+
   
 }
 
@@ -24,11 +31,7 @@ function alphabeticalSort(list){
 
 function fetchData(link){
 
-  fetch(link)
-  .then(res => res.json())
-  .then(data => allEpisodes = data)
-  .catch(err => alert(err))
-
+  
 }
 
 function makePageForEpisodes(episodeList) {
