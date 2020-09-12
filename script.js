@@ -1,19 +1,34 @@
 //You can edit ALL of the code here
-const allShows = getAllShows();
-console.log(allShows)
+let allShows = alphabeticalSort(getAllShows());
+let allEpisodes; 
+fetchData('https://api.tvmaze.com/shows/82/episodes');
 
-let allEpisodes = fetchData('https://api.tvmaze.com/shows/82/episodes');
 const rootElem = document.getElementById("root");
 
 function setup() {
+  
   makePageForEpisodes(allEpisodes);
+  
+}
+
+function alphabeticalSort(list){
+   return list.sort((x,y) => {
+    if(x.name.toLowerCase() > y.name.toLowerCase()){
+      return 1;
+    } else{
+      return -1;
+    }
+    return 0;
+  })
 }
 
 function fetchData(link){
+
   fetch(link)
   .then(res => res.json())
   .then(data => allEpisodes = data)
- 
+  .catch(err => alert(err))
+
 }
 
 function makePageForEpisodes(episodeList) {
@@ -44,15 +59,21 @@ function createHeroSection(){
 
 function createSelector(name, list){
   const selector = document.createElement('select');
-  const option = document.createElement('option');
-
   selector.setAttribute('class', `selector-list-${name}`);
-  option.setAttribute('class', `first-option-${name}`);
 
+  populateSelector(name, list, selector)
+ 
+  return selector;
+}
+
+
+
+function populateSelector(name, list, parent){
+  const option = document.createElement('option');
+  option.setAttribute('class', `first-option-${name}`);
   option.innerHTML = `All ${name}`;
 
-  selector.appendChild(option); 
-
+  parent.appendChild(option); 
   list.map(item => {
     let format = '';
     const option = document.createElement('option');
@@ -64,18 +85,13 @@ function createSelector(name, list){
       option.innerHTML =  item.name;
     }
     
-    selector.appendChild(option);
+    parent.appendChild(option);
   })
-
-
-  return selector;
 }
 
 function createInputsSection(episodeList){
   const inputsSection = document.createElement('div');
   const inputSearch = document.createElement('input');
-  // const episodeSelector = document.createElement('select');
-  // const episodeOption = document.createElement('option');
   const text = document.createElement('p');
   
 
@@ -83,25 +99,16 @@ function createInputsSection(episodeList){
   inputSearch.setAttribute('type', 'search');
   inputSearch.setAttribute('class', 'input-search');
   inputSearch.setAttribute('placeholder', 'Search...');
-  // episodeSelector.setAttribute('class', 'selector-list');
-  // episodeOption.setAttribute('class', 'first-option');
-  // episodeOption.innerHTML = 'All episodes';
+ 
   text.setAttribute('class', 'search-text');
   text.innerHTML = `Displaying ${ episodeList.length } / ${allEpisodes.length} `;
-  // episodeSelector.appendChild(episodeOption); 
-
-  // allEpisodes.map(episode => {
-  //   const episodeOption = document.createElement('option');
-  //   episodeOption.setAttribute('class', 'option');
-  //   let format = `S${seasonEpisodeFormat(episode.season)} E${seasonEpisodeFormat(episode.number)}`;
-  //   episodeOption.innerHTML =  `${format} - ${episode.name}`;
-  //   episodeSelector.appendChild(episodeOption);
-  // })
+ 
   let showSelector = createSelector('shows', allShows); //first parameter hardcoded 
   let episodeSelector = createSelector('episodes', allEpisodes); //first parameter hardcoded 
 
+  showSelector.addEventListener('change', onShowSelectEvent);
   inputSearch.addEventListener('keyup', onSearchEvent);
-  episodeSelector.addEventListener('change', onSelectEvent);
+  episodeSelector.addEventListener('change', onEpisodeSelectEvent);
   inputsSection.appendChild(showSelector);
   inputsSection.appendChild(episodeSelector);
   inputsSection.appendChild(inputSearch);
@@ -163,6 +170,7 @@ function createEpisodeCard(title, seasonNr, episodeNr, imageUrl, summary){
   return episodeCard;
 }
 
+
 function createCopyrightSection(text, imageUrl){
   const copyrightSection = document.createElement('div');
   const copyrightText = document.createElement('h5');
@@ -183,13 +191,34 @@ function createCopyrightSection(text, imageUrl){
   return copyrightSection;
 
 }
+function onShowSelectEvent(event){
+  const episodesSection = document.querySelector('.episodes-section');
+  const searchInput = document.querySelector('.input-search');
+  const episodeSelector = document.querySelector('.selector-list-episodes');
+  const text = document.querySelector('.search-text');
+  
+  allShows.forEach(item => {
+    if(item.name === event.target.value)
+      fetch(`https://api.tvmaze.com/shows/${item.id}/episodes`)
+      .then(res => res.json())
+      .then(data => {
+        allEpisodes = data;
+        text.innerHTML = `Displaying ${ allEpisodes.length } / ${allEpisodes.length} `;
+        searchInput.value = '';
+        episodeSelector.innerHTML = '';
+        episodesSection.innerHTML = '';
+        populateSelector('episodes', data, episodeSelector );
+        displayEpisodes(data,episodesSection) })
+    
+  })
+}
 
 function onSearchEvent(event){
-  let selectorOption = document.querySelector('.selector-list');
-  let initialSelectorOption = document.querySelector('.first-option').value;
+  const selectorOption = document.querySelector(`.selector-list-episodes`); //selector-list-episodes
+  const initialSelectorOption = document.querySelector('.first-option-episodes').value; // first-option-episodes hardcoded
   const text = document.querySelector('.search-text');
   const episodesSection = document.querySelector('.episodes-section');
-  let searchValue = event.target.value.toLowerCase();
+  const searchValue = event.target.value.toLowerCase();
   filteredEpisodes = filterEpisodeListByWord(searchValue);
   text.innerHTML = `Displaying ${ filteredEpisodes.length } / ${allEpisodes.length} `;
   selectorOption.value = initialSelectorOption;
@@ -197,12 +226,13 @@ function onSearchEvent(event){
   displayEpisodes(filteredEpisodes, episodesSection);
 }
 
-function onSelectEvent(event){
-  let searchInput = document.querySelector('.input-search');
+function onEpisodeSelectEvent(event){
+  const searchInput = document.querySelector('.input-search');
   const text = document.querySelector('.search-text');
   const episodesSection = document.querySelector('.episodes-section');  
   searchInput.value = '';
   let optionValue = event.target.value.toLowerCase();
+  // console.log(optionValue)
   filteredEpisodes = filterEpisodeListByOption(optionValue);
   text.innerHTML = `Displaying ${ filteredEpisodes.length } / ${allEpisodes.length} `;
   episodesSection.innerHTML = '';
@@ -211,11 +241,15 @@ function onSelectEvent(event){
 }
 
 function filterEpisodeListByWord(word){
-  return allEpisodes.filter(episode => episode.name.toLowerCase().includes(word) || episode.summary.toLowerCase().includes(word));
+  
+  return allEpisodes.filter(episode => !episode.summary  ? episode.name.toLowerCase().includes(word.trim()) : episode.summary.toLowerCase().includes(word.trim()) || episode.name.toLowerCase().includes(word.trim()));
+  
 }
 function filterEpisodeListByOption(option){
+  //10 on line 251 represents the first letters after the title was formated with seasonEpisodeFormat()   eg: S01 E01 - 
   const firstOption = document.querySelector('.first-option-episodes').value.toLowerCase();
-  return allEpisodes.filter(episode => option === firstOption ? allEpisodes : option.includes(episode.name.toLowerCase()));
+  option = option !== firstOption ? option.split('').splice(10).join('') : option;
+  return allEpisodes.filter(episode => option === firstOption ? allEpisodes : option.toLowerCase() === episode.name.toLowerCase());
 }
 
 function seasonEpisodeFormat(seasonNr){
@@ -224,7 +258,9 @@ function seasonEpisodeFormat(seasonNr){
 
 function displayEpisodes(episodeList, parentNode){
   episodeList.forEach(episode => {
-    parentNode.appendChild(createEpisodeCard(episode.name, episode.season, episode.number, episode.image.original, episode.summary));
+    let image = episode.image ? episode.image.original : 'https://mu-property.com/wp-content/themes/realestate-7/images/no-image.png';
+    let summary = episode.summary ? episode.summary : "<p>Description available soon</p>";
+    parentNode.appendChild(createEpisodeCard(episode.name, episode.season, episode.number, image , summary));
   })
 }
 
