@@ -2,7 +2,6 @@
 let allShows = alphabeticalSort(getAllShows());
 let allEpisodes; 
 
-fetchData('https://api.tvmaze.com/shows/82/episodes');
 const rootElem = document.getElementById("root");
 
 function setup() {
@@ -29,16 +28,14 @@ function alphabeticalSort(list){
   })
 }
 
-function fetchData(link){
 
-  
-}
-
-function makePageForEpisodes(episodeList) {
+function makePageForEpisodes() {
   
   rootElem.appendChild(createHeroSection())
-  rootElem.appendChild(createInputsSection(episodeList))
-  rootElem.appendChild(createEpisodesSection(episodeList))
+  rootElem.appendChild(createShowInputsSection())
+  // rootElem.appendChild(createInputsSection(episodeList))
+  // rootElem.appendChild(createEpisodesSection(episodeList))
+  rootElem.appendChild(createShowsSection(allShows));
   rootElem.appendChild(createCopyrightSection('Original data from', 'https://static.tvmaze.com/images/tvm-header-logo.png'));
   
 }
@@ -96,28 +93,42 @@ function createInputsSection(episodeList){
   const inputsSection = document.createElement('div');
   const inputSearch = document.createElement('input');
   const text = document.createElement('p');
+  const goBackButton = document.createElement('button');
   
 
   inputsSection.setAttribute('class', 'inputs-section');
   inputSearch.setAttribute('type', 'search');
   inputSearch.setAttribute('class', 'input-search');
   inputSearch.setAttribute('placeholder', 'Search...');
+  goBackButton.setAttribute('class', 'btn');
+  // goBackButton.setAttribute('onClick', goBack);
+  goBackButton.innerHTML = `Main Page`;
  
   text.setAttribute('class', 'search-text');
   text.innerHTML = `Displaying ${ episodeList.length } / ${allEpisodes.length} `;
  
-  let showSelector = createSelector('shows', allShows); //first parameter hardcoded 
+   //first parameter hardcoded 
   let episodeSelector = createSelector('episodes', allEpisodes); //first parameter hardcoded 
 
-  showSelector.addEventListener('change', onShowSelectEvent);
+  // showSelector.addEventListener('change', onShowSelectEvent);
   inputSearch.addEventListener('keyup', onSearchEvent);
+
   episodeSelector.addEventListener('change', onEpisodeSelectEvent);
-  inputsSection.appendChild(showSelector);
+  goBackButton.addEventListener('click', goBack);
+
+  inputsSection.appendChild(goBackButton);
   inputsSection.appendChild(episodeSelector);
   inputsSection.appendChild(inputSearch);
   inputsSection.appendChild(text);
 
   return inputsSection;
+}
+
+function goBack(){
+  console.log('hsdajfdsjf')
+  rootElem.innerHTML = '';
+  makePageForEpisodes();
+  
 }
 
 function createEpisodesSection(episodeList){
@@ -196,6 +207,8 @@ function createCopyrightSection(text, imageUrl){
 }
 function onShowSelectEvent(event){
   const episodesSection = document.querySelector('.episodes-section');
+  const showsSection = document.querySelector('.shows-section');
+  const showInputsSection = document.querySelector('.show-inputs-section');
   const searchInput = document.querySelector('.input-search');
   const episodeSelector = document.querySelector('.selector-list-episodes');
   const text = document.querySelector('.search-text');
@@ -205,13 +218,22 @@ function onShowSelectEvent(event){
       fetch(`https://api.tvmaze.com/shows/${item.id}/episodes`)
       .then(res => res.json())
       .then(data => {
+        showsSection.remove();
+        showInputsSection.remove();
         allEpisodes = data;
+        console.log(data);
         text.innerHTML = `Displaying ${ allEpisodes.length } / ${allEpisodes.length} `;
-        searchInput.value = '';
-        episodeSelector.innerHTML = '';
-        episodesSection.innerHTML = '';
-        populateSelector('episodes', data, episodeSelector );
-        displayEpisodes(data,episodesSection) })
+        searchInput ? searchInput.value = '' : '';
+        episodeSelector ? episodeSelector.innerHTML = '' : '';
+        episodesSection ? episodesSection.innerHTML = '' : '';
+        // populateSelector('episodes', data, episodeSelector );
+        // displayEpisodes(data,episodesSection) 
+        // rootElem.appendChild(createInputsSection(allEpisodes))
+        // rootElem.appendChild(createEpisodesSection(allEpisodes))
+        rootElem.insertBefore(createInputsSection(allEpisodes), rootElem.children[1]);
+        rootElem.insertBefore(createEpisodesSection(allEpisodes), rootElem.children[2]);
+      
+      })
     
   })
 }
@@ -268,5 +290,117 @@ function displayEpisodes(episodeList, parentNode){
 }
 
 
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+function createShowsSection(allShows){
+  const showsSection = document.createElement('div');
+  showsSection.setAttribute('class', 'shows-section');
+
+  displayShows(allShows, showsSection);
+  return showsSection;
+}
+
+function displayShows(showList, parentNode){
+  showList.forEach(show => {
+    let image = show.image ? show.image.original : 'https://mu-property.com/wp-content/themes/realestate-7/images/no-image.png';
+    let summary = show.summary ? show.summary : "<p>Description available soon</p>";
+    parentNode.appendChild(createShowCard(show));
+  })
+}
+
+function createShowCard(show){
+  const showCard = document.createElement('div');
+  const showImg = document.createElement('img');
+  const showContainerRight = document.createElement('div');
+  const showTitle = document.createElement('h2');
+  const showInfo = document.createElement('div');
+  const showRuntime = document.createElement('div');
+  const showGenres = document.createElement('div');
+  const showStatus = document.createElement('div');
+  const showSummary = document.createElement('p');
+
+  const showRating= document.createElement('div');
+  const showRatingImg= document.createElement('img');
+  const showRatingNumber= document.createElement('p');
+
+  showCard.setAttribute('class', 'show');
+  show.image ? showImg.setAttribute('src', show.image.original) : showImg.setAttribute('src', 'https://mu-property.com/wp-content/themes/realestate-7/images/no-image.png');
+  
+  showImg.setAttribute('class', 'show-img');
+  showContainerRight.setAttribute('class', 'show-container-right')
+
+
+  showTitle.textContent = show.name;
+  showTitle.setAttribute('class', 'show-title');
+
+  showInfo.setAttribute('class', 'show-info');
+  showRuntime.setAttribute('class', 'show-runtime');
+  showRuntime.textContent = `${show.runtime} min`;
+
+  show.genres.length > 0 ? show.genres.forEach((genre,i) => i === show.genres.length - 1 ? showGenres.textContent += `${genre}` : showGenres.textContent += `${genre} | `) : showGenres.textContent = 'No data available';
+  showGenres.setAttribute('class', 'show-genres');
+ 
+  showStatus.setAttribute('class', 'show-status');
+  showStatus.textContent = show.status;
+
+  showSummary.innerHTML = show.summary;
+  showSummary.setAttribute('class', 'show-summary');
+
+  showRating.setAttribute('class', 'show-rating');
+  showRatingImg.setAttribute('class', 'show-rating-img');
+  showRatingImg.setAttribute('src', './star.svg');
+  showRatingNumber.setAttribute('class', 'show-rating-number');
+  show.rating ? show.rating.average ? showRatingNumber.textContent = show.rating.average : '' : '';
+
+
+
+
+  showInfo.appendChild(showRuntime);
+  showInfo.appendChild(showGenres);
+  showInfo.appendChild(showStatus);
+  showRating.appendChild(showRatingImg);
+  showRating.appendChild(showRatingNumber);
+
+  showContainerRight.appendChild(showTitle);
+  showContainerRight.appendChild(showInfo);
+  showContainerRight.appendChild(showSummary);
+  showContainerRight.appendChild(showRating);
+
+  showCard.appendChild(showImg);
+  showCard.appendChild(showContainerRight);
+
+
+  return showCard;
+}
+
+function createShowInputsSection(){
+
+  const showInputsSection = document.createElement('div');
+  const showSearch = document.createElement('input');
+  const text = document.createElement('p');
+ 
+ 
+  showInputsSection.setAttribute('class', 'show-inputs-section');
+  showSearch.setAttribute('class', 'show-input-search');
+  showSearch.setAttribute('placeholder', 'Search...');
+  showSearch.setAttribute('type', 'search');
+
+  text.setAttribute('class', 'search-text');
+  text.innerHTML = `Displaying ${ allShows.length } / ${allShows.length} `;
+
+  let showSelector = createSelector('shows', allShows);
+  // showSelector.addEventListener('click', showSelector);
+
+  showSelector.addEventListener('change', onShowSelectEvent);
+
+
+  showInputsSection.appendChild(showSelector);
+  showInputsSection.appendChild(showSearch);
+  showInputsSection.appendChild(text);
+
+  return showInputsSection;
+}
 
 window.onload = setup;
