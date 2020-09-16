@@ -101,7 +101,6 @@ function createInputsSection(episodeList){
   inputSearch.setAttribute('class', 'input-search');
   inputSearch.setAttribute('placeholder', 'Search...');
   goBackButton.setAttribute('class', 'btn');
-  // goBackButton.setAttribute('onClick', goBack);
   goBackButton.innerHTML = `Main Page`;
  
   text.setAttribute('class', 'search-text');
@@ -125,7 +124,6 @@ function createInputsSection(episodeList){
 }
 
 function goBack(){
-  console.log('hsdajfdsjf')
   rootElem.innerHTML = '';
   makePageForEpisodes();
   
@@ -214,12 +212,13 @@ function onShowSelectEvent(event){
   const text = document.querySelector('.search-text');
   
   allShows.forEach(item => {
-    if(item.name === event.target.value)
+    if(item.name === event.target.value || item.name === event.target.textContent)
       fetch(`https://api.tvmaze.com/shows/${item.id}/episodes`)
       .then(res => res.json())
       .then(data => {
         showsSection.remove();
         showInputsSection.remove();
+        window.scrollTo({top: 0});
         allEpisodes = data;
         console.log(data);
         text.innerHTML = `Displaying ${ allEpisodes.length } / ${allEpisodes.length} `;
@@ -244,11 +243,22 @@ function onSearchEvent(event){
   const text = document.querySelector('.search-text');
   const episodesSection = document.querySelector('.episodes-section');
   const searchValue = event.target.value.toLowerCase();
-  filteredEpisodes = filterEpisodeListByWord(searchValue);
+  filteredEpisodes = filterEpisodeListByWord(searchValue, 'episode'); // 'episode' hardcoded
   text.innerHTML = `Displaying ${ filteredEpisodes.length } / ${allEpisodes.length} `;
   selectorOption.value = initialSelectorOption;
   episodesSection.innerHTML = '';
   displayEpisodes(filteredEpisodes, episodesSection);
+}
+
+function onShowSearchEvent(event){
+  const showsSection = document.querySelector('.shows-section')
+  const text = document.querySelector('.search-text');
+  const searchValue = event.target.value.toLowerCase();
+  filteredShows = filterEpisodeListByWord(searchValue, 'show'); // 'show' hardcoded
+  text.innerHTML = `Displaying ${ filteredShows.length } / ${allShows.length} `;
+  
+  showsSection.innerHTML = '';
+  displayShows(filteredShows, showsSection);
 }
 
 function onEpisodeSelectEvent(event){
@@ -265,11 +275,14 @@ function onEpisodeSelectEvent(event){
 
 }
 
-function filterEpisodeListByWord(word){
-  
-  return allEpisodes.filter(episode => !episode.summary  ? episode.name.toLowerCase().includes(word.trim()) : episode.summary.toLowerCase().includes(word.trim()) || episode.name.toLowerCase().includes(word.trim()));
-  
+function filterEpisodeListByWord(word, searchBoxName){
+  console.log(word)
+  if(searchBoxName === 'episode')
+    return allEpisodes.filter(episode => !episode.summary  ? episode.name.toLowerCase().includes(word.trim()) : episode.summary.toLowerCase().includes(word.trim()) || episode.name.toLowerCase().includes(word.trim()));
+    return allShows.filter(show => !show.summary  ? show.name.toLowerCase().includes(word.trim()) : show.summary.toLowerCase().includes(word.trim()) || show.name.toLowerCase().includes(word.trim()));
 }
+
+
 function filterEpisodeListByOption(option){
   //10 on line 251 represents the first letters after the title was formated with seasonEpisodeFormat()   eg: S01 E01 - 
   const firstOption = document.querySelector('.first-option-episodes').value.toLowerCase();
@@ -335,6 +348,8 @@ function createShowCard(show){
   showTitle.textContent = show.name;
   showTitle.setAttribute('class', 'show-title');
 
+  showTitle.addEventListener('click', onShowSelectEvent);
+
   showInfo.setAttribute('class', 'show-info');
   showRuntime.setAttribute('class', 'show-runtime');
   showRuntime.textContent = `${show.runtime} min`;
@@ -394,6 +409,7 @@ function createShowInputsSection(){
   // showSelector.addEventListener('click', showSelector);
 
   showSelector.addEventListener('change', onShowSelectEvent);
+  showSearch.addEventListener('keyup', onShowSearchEvent);
 
 
   showInputsSection.appendChild(showSelector);
