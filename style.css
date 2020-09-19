@@ -332,7 +332,6 @@ body{
   min-height: 40rem;
   margin: 5rem auto;
   display: flex;
-  /* align-items: center; */
   font-size: 1.6rem;
   background-image: linear-gradient(to top right, var(--color-1) 50%, var(--color-2));
   color: var(--color-white-smoke);
@@ -342,11 +341,6 @@ body{
   
 }
 
-/* .show:hover{
-  transform: translateY(-1px);
-  box-shadow: 1px 1px 10px white;
-} */
-
 .show-img{
   width: 30rem;
   object-fit:cover; 
@@ -355,7 +349,7 @@ body{
 .show-container-right{
   padding: 2rem;
   position: relative;
- 
+  width: 100%;
   
 }
 
@@ -382,6 +376,7 @@ body{
   box-shadow: 0 0 3px white;
   border: 1px solid var(--color-3);
   font-size: 1.4rem;
+  text-align: center;
 }
 .show-summary{
   font-weight: 300;
@@ -394,9 +389,6 @@ body{
   right: 0;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--color-3);
-  border-left: 1px solid var(--color-3);
-  box-shadow: -.5px .5px 3px white;
 }
 .show-rating-img{
   width: 2rem;
@@ -434,8 +426,6 @@ body{
     width: 90%;
   }
   .show-img{
-    height: 100%;
-    /* align-self: stretch; */
     width: 24rem; 
     object-fit:cover; 
   }
@@ -449,22 +439,21 @@ body{
     flex-direction: column;
     height: max-content;
     align-items: center;
-    /* width: 90%; */
+    width: 70%;
+  }
+
+  .show-title{
+    width: 75%;
   }
   .show-img{
-    /* height: 40rem; */
     width: 100%;
     object-fit: cover;
   }
 
-  
-
-  .show-rating{
-    top: -4.5rem;
+  .show-container-right{
+    width: initial;
   }
 
-  
-  
   
 }
 
@@ -509,32 +498,56 @@ body{
     font-size: 1.1rem;
     width: 27rem;
   }
-
+  .show{
+    width: 90%;
+    text-align: center;
+  }
   .show-info{
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
     
   }
+
+  .show-title{
+    width: 100%;
+    font-size: 2.7rem;
+  }
   .show-genres,.show-status,.show-runtime{
-    margin: 1rem 0;
+    margin: 1rem;
     width: max-content;
   }
 
+  .show-genres{
+    order: 3;
+  }
+
   .show-container-right{
-    padding-top: 5rem;
+ 
+    padding-top: 7rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    text-align: center  ;
+    
   }
 
+  
   .show-rating{
     width: max-content;
-    top: 0;
+    top: 1rem;
     left: 50%;
     transform: translateX(-50%);
-    border: none;
+    background-color: transparent;
+    box-shadow: 0 0 3px white;
+    border: 1px solid var(--color-3);
+    
   }
+
+  .show-summary{
+    text-align: justify;
+  }
+
+ 
   
 }
